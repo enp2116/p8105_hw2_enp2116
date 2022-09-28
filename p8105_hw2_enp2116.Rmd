@@ -1,0 +1,98 @@
+---
+title: "p8105_hw2_enp2116"
+author: "Emily Potts"
+date: "2022-09-27"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
+```{r}
+
+```
+Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. Are these data tidy?
+
+Answer the following questions using these data:
+
+* How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
+
+* How many stations are ADA compliant?
+
+* What proportion of station entrances / exits without vending allow entrance?
+
+Reformat data so that route number and route name are distinct variables. 
+```{r}
+
+```
+
+* How many distinct stations serve the A train? 
+* Of the stations that serve the A train, how many are ADA compliant?
+
+
+
+# Problem 2
+
+Read and clean the Mr. Trash Wheel sheet:
+
+* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+* use reasonable variable names
+* omit rows that do not include dumpster-specific data
+round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+```{r}
+
+```
+
+Read and clean the Professor Trash Wheel sheet:
+
+* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+* use reasonable variable names
+* omit rows that do not include dumpster-specific data
+round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+```{r}
+
+```
+
+Combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
+```{r}
+
+```
+
+Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. 
+
+* For available data, what was the total weight of trash collected by Professor Trash Wheel? 
+* What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
+
+
+
+# Problem 3
+In particular, we’ll use the data in pols-month.csv, unemployment.csv, and snp.csv. Our goal is to merge these into a single data frame using year and month as keys across datasets.
+
+First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+```{r}
+
+```
+
+Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
+```{r}
+
+```
+
+Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+```{r}
+
+```
+
+
+Join the datasets by merging snp into pols, and merging unemployment into the result.
+```{r}
+
+```
+
+Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+
+
