@@ -7,32 +7,60 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 # Problem 1
 
-Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
+Reading and cleaning the data; retaining line, station, name, station latitude / longitude, routes served, entry (logical), vending, entrance type, and ADA compliance. 
 ```{r}
-
+nyc_transit_data =
+  read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(line:entry, vending, ada) %>%
+  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
 ```
-Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. Are these data tidy?
 
-Answer the following questions using these data:
+The cleaned NYC transit dataset contains the variables: `r names(nyc_transit_data)`. Thusfar, I have cleaned the data by turning all variable names into lower- and camel-case, selecting only the variables asked for, and recoding the entry variable as logical. The `NYC Transit` dataset has `r nrow(nyc_transit_data)` rows and `r ncol(nyc_transit_data)` columns, indicating we have data on  `r nrow(nyc_transit_data)` different entrances or exits and want to look at `r ncol(nyc_transit_data)` different traits in each of these. These data are not yet tidy, as we have 11 "route" variables (for each of the routes offered at a given entrance or exit), which can be condensed into two columns to be tidy.
 
-* How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
+* In this dataset, we have `r nrow(distinct(nyc_transit_data, station_name, line))` distinct stations.
 
-* How many stations are ADA compliant?
+* There are `r nrow(filter(nyc_transit_data, ada == TRUE))` ADA compliant stations.
 
-* What proportion of station entrances / exits without vending allow entrance?
+* The proportion of station entrances / exits without vending allow entrance is `r (nrow(filter(nyc_transit_data, vending == "NO", entry == TRUE)))/(nrow(nyc_transit_data))`.
+
 
 Reformat data so that route number and route name are distinct variables. 
 ```{r}
-
+tidy_nyc_transit_data =
+  read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(line:entry, vending, ada) %>%
+  pivot_longer(
+    cols = contains('route'),
+    names_to = "route_number",
+    names_prefix = "route",
+    values_to = "route_name",
+    values_transform = list(route_name = as.character),
+    values_drop_na = TRUE ) %>%
+  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
 ```
 
-* How many distinct stations serve the A train? 
-* Of the stations that serve the A train, how many are ADA compliant?
+* How many distinct stations serve the A train?
+```{r}
+tidy_nyc_transit_data %>%
+  distinct(station_name, route_name) %>%
+  filter(route_name == "A") %>%
+  nrow()
+```
 
+* Of the stations that serve the A train, how many are ADA compliant?
+```{r}
+tidy_nyc_transit_data %>%
+  filter(route_name == "A") %>%
+  filter(ada == TRUE) %>%
+  nrow()
+```
 
 
 # Problem 2
@@ -44,7 +72,10 @@ Read and clean the Mr. Trash Wheel sheet:
 * omit rows that do not include dumpster-specific data
 round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
 ```{r}
-
+lotr_words_df = 
+  read_excel(
+    "data/LotR_Words.xlsx",
+    range = "B3:D6")
 ```
 
 Read and clean the Professor Trash Wheel sheet:
@@ -54,12 +85,10 @@ Read and clean the Professor Trash Wheel sheet:
 * omit rows that do not include dumpster-specific data
 round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
 ```{r}
-
 ```
 
 Combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
 ```{r}
-
 ```
 
 Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. 
@@ -74,25 +103,19 @@ In particular, we’ll use the data in pols-month.csv, unemployment.csv, and snp
 
 First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
 ```{r}
-
 ```
 
 Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
 ```{r}
-
 ```
 
 Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
 ```{r}
-
 ```
 
 
 Join the datasets by merging snp into pols, and merging unemployment into the result.
 ```{r}
-
 ```
 
 Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
-
-
