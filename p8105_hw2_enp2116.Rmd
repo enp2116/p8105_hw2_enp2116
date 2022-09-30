@@ -13,8 +13,8 @@ library(readxl)
 
 # Problem 1
 
-Reading and cleaning the data; retaining line, station, name, station latitude / longitude, routes served, entry (logical), vending, entrance type, and ADA compliance. 
-```{r}
+Reading and cleaning the data; retaining line, station, name, station latitude / longitude, routes served, entry (logical), vending, entrance type, and ADA compliance: 
+```{r, message=FALSE}
 nyc_transit_data =
   read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names() %>%
@@ -31,8 +31,8 @@ The cleaned NYC transit dataset contains the variables: `r names(nyc_transit_dat
 * The proportion of station entrances / exits without vending allow entrance is `r (nrow(filter(nyc_transit_data, vending == "NO", entry == TRUE)))/(nrow(nyc_transit_data))`.
 
 
-Reformat data so that route number and route name are distinct variables. 
-```{r}
+Reformatting dataset so that route number and route name are distinct variables:
+```{r, message=FALSE}
 tidy_nyc_transit_data =
   read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names() %>%
@@ -48,7 +48,7 @@ tidy_nyc_transit_data =
 ```
 
 * How many distinct stations serve the A train?
-```{r}
+```{r, echo=FALSE}
 tidy_nyc_transit_data %>%
   distinct(station_name, route_name) %>%
   filter(route_name == "A") %>%
@@ -56,7 +56,7 @@ tidy_nyc_transit_data %>%
 ```
 
 * Of the stations that serve the A train, how many are ADA compliant?
-```{r}
+```{r, echo=FALSE}
 tidy_nyc_transit_data %>%
   filter(route_name == "A") %>%
   filter(ada == TRUE) %>%
@@ -66,16 +66,12 @@ tidy_nyc_transit_data %>%
 
 # Problem 2
 
-Read and clean the Mr. Trash Wheel sheet:
-
-* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
-* use reasonable variable names
-* omit rows that do not include dumpster-specific data
-round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+Reading and cleaning the Mr. Trash Wheel sheet:
 ```{r}
 mr_trash_wheel =
   read_excel(
     "./Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+    sheet = "Mr. Trash Wheel",
     range = "A2:N533") %>%
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
@@ -83,24 +79,50 @@ mr_trash_wheel =
   mutate(sports_balls = as.integer(sports_balls))
 ```
 
-Read and clean the Professor Trash Wheel sheet:
-
-* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
-* use reasonable variable names
-* omit rows that do not include dumpster-specific data
-round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+Reading and cleaning the Professor Trash Wheel sheet:
 ```{r}
+prof_trash_wheel =
+  read_excel(
+    "./Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+    sheet = "Professor Trash Wheel",
+    range = "A2:N115") %>%
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(sports_balls = round(sports_balls, 0)) %>% 
+  mutate(sports_balls = as.integer(sports_balls))
 ```
 
-Combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
+Combining the Mr. Trash Wheel & Professor Trash Wheel datasets to produce a single tidy dataset (tidy_trash_wheel):
 ```{r}
+mr_trash_wheel = 
+  mutate(mr_trash_wheel, trash_wheel_type = "mr_trash_wheel")
+
+prof_trash_wheel = 
+  mutate(prof_trash_wheel, trash_wheel_type = "prof_trash_wheel")
+
+tidy_trash_wheel = 
+  bind_rows(mr_trash_wheel, prof_trash_wheel) %>%
+  janitor::clean_names() 
 ```
 
-Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. 
+The combined trash wheel dataset contains the variables: `r names(tidy_trash_wheel)` and has `r nrow(tidy_trash_wheel)` total observations. Data were collected from the two datasets: `r unique(tidy_trash_wheel$trash_wheel_type)`. The variable of weight_tons has values such as `r head(tidy_trash_wheel$weight_tons)` tons and sports_balls has values such as `r head(tidy_trash_wheel$sports_balls)`, measuring the number of sports balls present in each dumpster. 
 
 * For available data, what was the total weight of trash collected by Professor Trash Wheel? 
-* What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
 
+```{r, echo=FALSE}
+tidy_trash_wheel %>%
+  filter(trash_wheel_type == "prof_trash_wheel") %>%
+  select(weight_tons) %>%
+  sum()
+```
+
+* What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
+```{r, echo=FALSE}
+tidy_trash_wheel %>%
+  filter(trash_wheel_type == "mr_trash_wheel") %>%
+  select(sports_balls) %>%
+  sum()
+```
 
 
 # Problem 3
