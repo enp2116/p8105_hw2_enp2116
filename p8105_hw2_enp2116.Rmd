@@ -8,6 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
 ```
 
 # Problem 1
@@ -72,10 +73,14 @@ Read and clean the Mr. Trash Wheel sheet:
 * omit rows that do not include dumpster-specific data
 round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
 ```{r}
-lotr_words_df = 
+mr_trash_wheel =
   read_excel(
-    "data/LotR_Words.xlsx",
-    range = "B3:D6")
+    "./Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+    range = "A2:N533") %>%
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(sports_balls = round(sports_balls, 0)) %>% 
+  mutate(sports_balls = as.integer(sports_balls))
 ```
 
 Read and clean the Professor Trash Wheel sheet:
