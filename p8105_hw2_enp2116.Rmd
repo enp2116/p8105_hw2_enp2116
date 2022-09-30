@@ -183,17 +183,9 @@ snp_pols_unemp_data =
   left_join(snp_pols_data, unemployment_data, by = c("year", "month"))
 ```
 
-Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
-
 The tidy `pols-month` dataset contained `r nrow(pols_month_data)` rows and `r ncol(pols_month_data)` columns, meaning `r nrow(pols_month_data)` total observations and `r ncol(pols_month_data)` variables measured. This dataset contained information from years: `r range(pols_month_data$year)`, including variables that measured political standing across governors, senators, representatives, and presidents for the given each month and year. Variables such as gov_dem took values such as `r head(pols_month_data$gov_dem)` (representing the number of democratic governors) and the variable of president took values of `r unique(pols_month_data$president)`.
 
 The tidy `snp` dataset contained `r nrow(snp_data)` rows and `r ncol(snp_data)` columns, meaning `r nrow(snp_data)` total observations and `r ncol(snp_data)` variables measured. This dataset contained information from years: `r range(snp_data$year)`. The key variable here is close, which measured the closing values of the S&P stock index on the associated date. This variable took on values such as `r head(snp_data$close)`.
-
-```{r}
-head(snp_data$close)
-head(unemployment_data$close)
-```
-
 
 The tidy `unemployment` dataset contained `r nrow(unemployment_data)` rows and `r ncol(unemployment_data)` columns, meaning `r nrow(unemployment_data)` total observations and `r ncol(unemployment_data)` variables measured. This dataset contained information from years: `r range(unemployment_data$year)`. The key variable here is the unemployment_rate, which took on values such as `r head(unemployment_data$unemployment_rate)`.
 
