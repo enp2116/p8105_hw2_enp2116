@@ -16,50 +16,69 @@ library(readxl)
 Reading and cleaning the data; retaining line, station, name, station latitude / longitude, routes served, entry (logical), vending, entrance type, and ADA compliance: 
 ```{r, message=FALSE}
 nyc_transit_data =
-  read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv", col_types = cols(Route8 = "c", Route9 = "c", Route10 = "c", Route11 = "c")) %>%
   janitor::clean_names() %>%
-  select(line:entry, vending, ada) %>%
+  select(line, station_name, station_latitude, station_longitude, 
+    starts_with("route"), entry, exit_only, vending, entrance_type, 
+    ada) %>%
   mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
 ```
 
 The cleaned NYC transit dataset contains the variables: `r names(nyc_transit_data)`. Thusfar, I have cleaned the data by turning all variable names into lower- and camel-case, selecting only the variables asked for, and recoding the entry variable as logical. The `NYC Transit` dataset has `r nrow(nyc_transit_data)` rows and `r ncol(nyc_transit_data)` columns, indicating we have data on  `r nrow(nyc_transit_data)` different entrances or exits and want to look at `r ncol(nyc_transit_data)` different traits in each of these. These data are not yet tidy, as we have 11 "route" variables (for each of the routes offered at a given entrance or exit), which can be condensed into two columns to be tidy.
 
-* In this dataset, we have `r nrow(distinct(nyc_transit_data, station_name, line))` distinct stations.
+* Distinct stations:
+```{r}
+nyc_transit_data %>% 
+  select(station_name, line) %>% 
+  distinct %>% 
+  nrow()
+```
 
-* There are `r nrow(filter(nyc_transit_data, ada == TRUE))` ADA compliant stations.
 
-* The proportion of station entrances / exits without vending allow entrance is `r (nrow(filter(nyc_transit_data, vending == "NO", entry == TRUE)))/(nrow(nyc_transit_data))`.
+* ADA compliant stations:
+```{r}
+nyc_transit_data %>% 
+  filter(ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct %>% 
+  nrow()
+```
+
+
+* The proportion of station entrances / exits without vending allow entrance:
+```{r}
+nyc_transit_data %>% 
+  filter(vending == "NO") %>% 
+  pull(entry) %>% 
+  mean
+```
 
 
 Reformatting dataset so that route number and route name are distinct variables:
 ```{r, message=FALSE}
-tidy_nyc_transit_data =
-  read_csv("./NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
-  janitor::clean_names() %>%
-  select(line:entry, vending, ada) %>%
+  tidy_nyc_transit_data =
+  nyc_transit_data %>% 
   pivot_longer(
-    cols = contains('route'),
-    names_to = "route_number",
-    names_prefix = "route",
-    values_to = "route_name",
-    values_transform = list(route_name = as.character),
-    values_drop_na = TRUE ) %>%
-  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route_name")
 ```
 
 * How many distinct stations serve the A train?
 ```{r, echo=FALSE}
 tidy_nyc_transit_data %>%
-  distinct(station_name, route_name) %>%
-  filter(route_name == "A") %>%
+  filter(route_name == "A") %>% 
+  select(station_name, line) %>% 
+  distinct %>% 
   nrow()
 ```
 
 * Of the stations that serve the A train, how many are ADA compliant?
 ```{r, echo=FALSE}
 tidy_nyc_transit_data %>%
-  filter(route_name == "A") %>%
-  filter(ada == TRUE) %>%
+  filter(route_name == "A", ada == TRUE) %>%
+  select(station_name, line) %>% 
+  distinct() %>% 
   nrow()
 ```
 
@@ -119,7 +138,7 @@ tidy_trash_wheel %>%
 * What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
 ```{r, echo=FALSE}
 tidy_trash_wheel %>%
-  filter(trash_wheel_type == "mr_trash_wheel") %>%
+  filter(trash_wheel_type == "mr_trash_wheel", year == "2020") %>%
   select(sports_balls) %>%
   sum()
 ```
@@ -155,7 +174,7 @@ snp_data =
   mutate(
     year_prefix = case_when(year < 16 ~ 20,
                           year > 49 ~ 19)) %>% 
-  mutate(year = paste(year_prefix, year, sep = "")) %>% 
+  mutate(year = paste(year_prefix, year, sep = "")) %>%
     select(-c(year_prefix, day))
 ```
 
