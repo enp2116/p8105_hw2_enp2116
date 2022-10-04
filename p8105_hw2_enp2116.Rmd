@@ -92,8 +92,7 @@ mr_trash_wheel =
     "./Trash Wheel Collection Data.xlsx",
     sheet = "Mr. Trash Wheel",
     range = "A2:N549") %>%
-  janitor::clean_names() %>% 
-  drop_na(dumpster) %>% 
+  janitor::clean_names()  %>% 
   mutate(sports_balls = round(sports_balls, 0)) %>% 
   mutate(sports_balls = as.integer(sports_balls)) 
 ```
@@ -104,9 +103,8 @@ prof_trash_wheel =
   read_excel(
     "./Trash Wheel Collection Data.xlsx",
     sheet = "Professor Trash Wheel",
-    range = "A2:M94") %>%
+    range = "A2:M96") %>%
   janitor::clean_names() %>% 
-  drop_na(dumpster) %>% 
   mutate(year = as.character(year))
 ```
 
