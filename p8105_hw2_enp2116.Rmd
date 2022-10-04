@@ -89,26 +89,25 @@ Reading and cleaning the Mr. Trash Wheel sheet:
 ```{r}
 mr_trash_wheel =
   read_excel(
-    "./Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+    "./Trash Wheel Collection Data.xlsx",
     sheet = "Mr. Trash Wheel",
-    range = "A2:N533") %>%
+    range = "A2:N549") %>%
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
   mutate(sports_balls = round(sports_balls, 0)) %>% 
-  mutate(sports_balls = as.integer(sports_balls))
+  mutate(sports_balls = as.integer(sports_balls)) 
 ```
 
 Reading and cleaning the Professor Trash Wheel sheet:
 ```{r}
 prof_trash_wheel =
   read_excel(
-    "./Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+    "./Trash Wheel Collection Data.xlsx",
     sheet = "Professor Trash Wheel",
-    range = "A2:N115") %>%
+    range = "A2:M94") %>%
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
-  mutate(sports_balls = round(sports_balls, 0)) %>% 
-  mutate(sports_balls = as.integer(sports_balls))
+  mutate(year = as.character(year))
 ```
 
 Combining the Mr. Trash Wheel & Professor Trash Wheel datasets to produce a single tidy dataset (tidy_trash_wheel):
@@ -160,7 +159,7 @@ pols_month_data =
   select(-c(prez_dem, prez_gop, day))
 
 ```
-
+* Note: the variable of president shows up with NA values in the tidy dataset due to a 2 value occurring in prez_gop from august 1974-december 1974, because President Gerald Ford was not elected into presidency but rather took over after Nixon. Dr. Goldsmith told us not to try to alter the data (change the 2s to 1s) but acknowledge the gap.
 
 Second, cleaning the data in snp.csv using a similar process to the above. For consistency across datasets, arranging according to year and month, and organizing so that year and month are the leading columns:
 ```{r, message=FALSE}
